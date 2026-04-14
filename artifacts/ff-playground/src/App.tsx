@@ -1,8 +1,11 @@
+import { useState } from "react";
 import ParticleBackground from "@/components/ParticleBackground";
 import Header from "@/components/Header";
 import ApiCard from "@/components/ApiCard";
 import FeaturesSection from "@/components/FeaturesSection";
 import Footer from "@/components/Footer";
+import LoginPage from "@/components/LoginPage";
+import { isLoggedIn } from "@/lib/auth";
 
 const apiEndpoints = [
   {
@@ -58,14 +61,12 @@ const apiEndpoints = [
   },
 ];
 
-function App() {
+function Playground() {
   return (
-    <div className="min-h-screen relative">
+    <div className="min-h-screen relative playground-enter">
       <ParticleBackground />
-
       <div className="relative z-10 flex flex-col items-center px-4 pb-8">
         <Header />
-
         <section className="w-full max-w-2xl mx-auto mt-10 space-y-6">
           {apiEndpoints.map((ep) => (
             <ApiCard
@@ -78,12 +79,21 @@ function App() {
             />
           ))}
         </section>
-
         <FeaturesSection />
         <Footer />
       </div>
     </div>
   );
+}
+
+function App() {
+  const [authed, setAuthed] = useState(isLoggedIn());
+
+  if (!authed) {
+    return <LoginPage onSuccess={() => setAuthed(true)} />;
+  }
+
+  return <Playground />;
 }
 
 export default App;

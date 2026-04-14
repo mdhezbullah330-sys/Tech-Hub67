@@ -21,6 +21,15 @@ export default function ApiCard({ title, description, baseUrl, params, responseT
   const [response, setResponse] = useState<string | null>(null);
   const [imageUrl, setImageUrl] = useState<string | null>(null);
   const [notification, setNotification] = useState<{ message: string; type: "success" | "error" } | null>(null);
+
+  const handleTogglePlayground = () => {
+    if (expanded) {
+      // Collapsing: clear responses
+      setResponse(null);
+      setImageUrl(null);
+    }
+    setExpanded(!expanded);
+  };
   const cardRef = useRef<HTMLDivElement>(null);
   const glowRef = useRef<HTMLDivElement>(null);
 
@@ -112,7 +121,7 @@ export default function ApiCard({ title, description, baseUrl, params, responseT
         <div className="flex gap-3 flex-wrap">
           <button
             className={`cyber-btn ${expanded ? "cyber-btn--active" : ""}`}
-            onClick={() => setExpanded(!expanded)}
+            onClick={handleTogglePlayground}
           >
             Playground
           </button>

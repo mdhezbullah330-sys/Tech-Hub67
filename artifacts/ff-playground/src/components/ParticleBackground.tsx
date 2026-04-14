@@ -6,6 +6,7 @@ interface Particle {
   vx: number;
   vy: number;
   size: number;
+  opacity: number;
 }
 
 export default function ParticleBackground() {
@@ -18,7 +19,7 @@ export default function ParticleBackground() {
     if (!ctx) return;
 
     let animId: number;
-    let mouse = { x: -1000, y: -1000 };
+    const mouse = { x: -9999, y: -9999 };
     let particles: Particle[] = [];
 
     function resize() {
@@ -28,17 +29,15 @@ export default function ParticleBackground() {
     }
 
     function initParticles() {
-      const count = Math.floor((canvas!.width * canvas!.height) / 12000);
-      particles = [];
-      for (let i = 0; i < count; i++) {
-        particles.push({
-          x: Math.random() * canvas!.width,
-          y: Math.random() * canvas!.height,
-          vx: (Math.random() - 0.5) * 0.5,
-          vy: (Math.random() - 0.5) * 0.5,
-          size: Math.random() * 2 + 0.5,
-        });
-      }
+      const count = Math.floor((canvas!.width * canvas!.height) / 9000);
+      particles = Array.from({ length: count }, () => ({
+        x: Math.random() * canvas!.width,
+        y: Math.random() * canvas!.height,
+        vx: (Math.random() - 0.5) * 0.3,
+        vy: (Math.random() - 0.5) * 0.3,
+        size: Math.random() * 1.2 + 0.3,
+        opacity: Math.random() * 0.5 + 0.2,
+      }));
     }
 
     function animate() {
@@ -47,43 +46,52 @@ export default function ParticleBackground() {
       for (let i = 0; i < particles.length; i++) {
         const p = particles[i];
 
+        // Gravity toward mouse
         const dx = mouse.x - p.x;
         const dy = mouse.y - p.y;
         const dist = Math.sqrt(dx * dx + dy * dy);
-        const maxDist = 150;
+        const attractRadius = 180;
 
-        if (dist < maxDist) {
-          const force = (maxDist - dist) / maxDist;
-          p.vx -= (dx / dist) * force * 0.8;
-          p.vy -= (dy / dist) * force * 0.8;
+        if (dist < attractRadius && dist > 0) {
+          const force = ((attractRadius - dist) / attractRadius) * 0.012;
+          p.vx += (dx / dist) * force;
+          p.vy += (dy / dist) * force;
         }
 
-        p.vx *= 0.98;
-        p.vy *= 0.98;
+        // Damping
+        p.vx *= 0.97;
+        p.vy *= 0.97;
+
         p.x += p.vx;
         p.y += p.vy;
 
+        // Wrap edges
         if (p.x < 0) p.x = canvas!.width;
         if (p.x > canvas!.width) p.x = 0;
         if (p.y < 0) p.y = canvas!.height;
         if (p.y > canvas!.height) p.y = 0;
 
+        // Draw particle
         ctx!.beginPath();
         ctx!.arc(p.x, p.y, p.size, 0, Math.PI * 2);
-        ctx!.fillStyle = `rgba(0, 255, 255, ${0.3 + p.size * 0.15})`;
+        ctx!.fillStyle = `rgba(0, 240, 255, ${p.opacity})`;
         ctx!.fill();
 
+        // Draw connections
         for (let j = i + 1; j < particles.length; j++) {
           const p2 = particles[j];
           const lx = p.x - p2.x;
           const ly = p.y - p2.y;
           const ld = Math.sqrt(lx * lx + ly * ly);
-          if (ld < 120) {
+          const maxLink = 110;
+
+          if (ld < maxLink) {
+            const alpha = (1 - ld / maxLink) * 0.09;
             ctx!.beginPath();
             ctx!.moveTo(p.x, p.y);
             ctx!.lineTo(p2.x, p2.y);
-            ctx!.strokeStyle = `rgba(0, 255, 255, ${0.12 * (1 - ld / 120)})`;
-            ctx!.lineWidth = 0.5;
+            ctx!.strokeStyle = `rgba(0, 240, 255, ${alpha})`;
+            ctx!.lineWidth = 0.4;
             ctx!.stroke();
           }
         }
@@ -92,19 +100,19 @@ export default function ParticleBackground() {
       animId = requestAnimationFrame(animate);
     }
 
-    function handleMouse(e: MouseEvent) {
+    function onMouseMove(e: MouseEvent) {
       mouse.x = e.clientX;
       mouse.y = e.clientY;
     }
 
-    function handleMouseLeave() {
-      mouse.x = -1000;
-      mouse.y = -1000;
+    function onMouseLeave() {
+      mouse.x = -9999;
+      mouse.y = -9999;
     }
 
     window.addEventListener("resize", resize);
-    window.addEventListener("mousemove", handleMouse);
-    window.addEventListener("mouseleave", handleMouseLeave);
+    window.addEventListener("mousemove", onMouseMove);
+    window.addEventListener("mouseleave", onMouseLeave);
 
     resize();
     animate();
@@ -112,8 +120,8 @@ export default function ParticleBackground() {
     return () => {
       cancelAnimationFrame(animId);
       window.removeEventListener("resize", resize);
-      window.removeEventListener("mousemove", handleMouse);
-      window.removeEventListener("mouseleave", handleMouseLeave);
+      window.removeEventListener("mousemove", onMouseMove);
+      window.removeEventListener("mouseleave", onMouseLeave);
     };
   }, []);
 

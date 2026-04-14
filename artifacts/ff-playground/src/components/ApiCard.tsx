@@ -1,4 +1,4 @@
-import { useState, useCallback } from "react";
+import { useState, useCallback, useRef } from "react";
 import Notification from "./Notification";
 
 interface ApiParam {
@@ -21,13 +21,30 @@ export default function ApiCard({ title, description, baseUrl, params, responseT
   const [response, setResponse] = useState<string | null>(null);
   const [imageUrl, setImageUrl] = useState<string | null>(null);
   const [notification, setNotification] = useState<{ message: string; type: "success" | "error" } | null>(null);
+  const cardRef = useRef<HTMLDivElement>(null);
+  const glowRef = useRef<HTMLDivElement>(null);
+
+  const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
+    const card = cardRef.current;
+    const glow = glowRef.current;
+    if (!card || !glow) return;
+    const rect = card.getBoundingClientRect();
+    const x = e.clientX - rect.left;
+    const y = e.clientY - rect.top;
+    glow.style.left = `${x}px`;
+    glow.style.top = `${y}px`;
+    glow.style.opacity = "1";
+  };
+
+  const handleMouseLeave = () => {
+    if (glowRef.current) glowRef.current.style.opacity = "0";
+  };
 
   const buildUrl = useCallback(() => {
     let url = baseUrl;
     params.forEach((p, i) => {
       const val = values[p.name] || `{${p.name}}`;
-      const sep = i === 0 ? "?" : "&";
-      url += `${sep}${p.name}=${encodeURIComponent(val)}`;
+      url += `${i === 0 ? "?" : "&"}${p.name}=${encodeURIComponent(val)}`;
     });
     return url;
   }, [baseUrl, params, values]);
@@ -46,11 +63,11 @@ export default function ApiCard({ title, description, baseUrl, params, responseT
     try {
       let url = baseUrl;
       params.forEach((p, i) => {
-        const sep = i === 0 ? "?" : "&";
-        url += `${sep}${p.name}=${encodeURIComponent(values[p.name])}`;
+        url += `${i === 0 ? "?" : "&"}${p.name}=${encodeURIComponent(values[p.name])}`;
       });
 
       if (responseType === "image") {
+        await new Promise((r) => setTimeout(r, 400));
         setImageUrl(url);
         setLoading(false);
         return;
@@ -68,36 +85,38 @@ export default function ApiCard({ title, description, baseUrl, params, responseT
 
   const handleCopyUrl = () => {
     const url = buildUrl();
-    navigator.clipboard.writeText(url).then(() => {
-      setNotification({ message: "Successfully copied to clipboard!", type: "success" });
-    }).catch(() => {
-      setNotification({ message: "Failed to copy URL", type: "error" });
-    });
+    navigator.clipboard.writeText(url)
+      .then(() => setNotification({ message: "Successfully copied to clipboard!", type: "success" }))
+      .catch(() => setNotification({ message: "Failed to copy URL", type: "error" }));
   };
+
+  const hasResponse = (response || imageUrl) && !loading;
 
   return (
     <>
-      <div className="glass-card p-6 w-full">
-        <div className="mb-4">
-          <span className="text-xs font-bold tracking-widest uppercase" style={{ color: "rgba(0, 255, 255, 0.5)" }}>
-            GET
-          </span>
-          <h3 className="text-xl font-bold mt-1" style={{ color: "hsl(180, 100%, 80%)" }}>
-            {title}
-          </h3>
-          <p className="text-sm mt-1" style={{ color: "rgba(0, 255, 255, 0.45)" }}>
-            {description}
-          </p>
+      <div
+        ref={cardRef}
+        className="api-card"
+        onMouseMove={handleMouseMove}
+        onMouseLeave={handleMouseLeave}
+      >
+        {/* Mouse glow */}
+        <div ref={glowRef} className="card-glow" />
+
+        <div className="mb-5">
+          <span className="get-badge">GET</span>
+          <h3 className="card-title">{title}</h3>
+          <p className="card-desc">{description}</p>
         </div>
 
         <div className="flex gap-3 flex-wrap">
           <button
-            className={`cyber-btn ${expanded ? "active" : ""}`}
+            className={`cyber-btn ${expanded ? "cyber-btn--active" : ""}`}
             onClick={() => setExpanded(!expanded)}
           >
             Playground
           </button>
-          <button className="cyber-btn" onClick={handleTestLive}>
+          <button className="cyber-btn" onClick={handleTestLive} disabled={loading}>
             Test Live
           </button>
           <button className="cyber-btn" onClick={handleCopyUrl}>
@@ -106,7 +125,10 @@ export default function ApiCard({ title, description, baseUrl, params, responseT
         </div>
 
         {expanded && (
-          <div className="mt-5 space-y-3 animate-in fade-in slide-in-from-top-2 duration-300">
+          <div
+            className="mt-5 space-y-3"
+            style={{ animation: "fadeSlideIn 0.25s ease forwards" }}
+          >
             {params.map((p) => (
               <input
                 key={p.name}
@@ -120,14 +142,16 @@ export default function ApiCard({ title, description, baseUrl, params, responseT
         )}
 
         {loading && (
-          <div className="mt-5 flex items-center gap-3">
-            <div className="spinner" />
-            <span className="text-sm" style={{ color: "rgba(0, 255, 255, 0.6)" }}>Fetching data...</span>
+          <div className="mt-5 flex items-center gap-4" style={{ animation: "fadeSlideIn 0.2s ease" }}>
+            <div className="pulse-ring">
+              <div className="pulse-dot" />
+            </div>
+            <span className="loading-text">Fetching Data...</span>
           </div>
         )}
 
         {imageUrl && !loading && (
-          <div className="mt-5 response-box flex items-center justify-center">
+          <div className="response-box mt-5 flex items-center justify-center">
             <img
               src={imageUrl}
               alt="API Response"
@@ -141,9 +165,13 @@ export default function ApiCard({ title, description, baseUrl, params, responseT
         )}
 
         {response && !loading && (
-          <div className="mt-5 response-box">
+          <div className="response-box mt-5">
             <pre className="whitespace-pre-wrap break-words">{response}</pre>
           </div>
+        )}
+
+        {!hasResponse && !loading && (
+          <div style={{ height: "0" }} />
         )}
       </div>
 

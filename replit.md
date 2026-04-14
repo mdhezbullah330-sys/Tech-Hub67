@@ -16,6 +16,20 @@ pnpm workspace monorepo using TypeScript. Each package manages its own dependenc
 - **API codegen**: Orval (from OpenAPI spec)
 - **Build**: esbuild (CJS bundle)
 
+## Artifacts
+
+### Free Fire API Playground (`artifacts/ff-playground`)
+- **Type**: React + Vite frontend-only app (no backend needed)
+- **Description**: Dark Tech themed single-page API interaction hub for Free Fire tools
+- **Features**:
+  - Interactive particle background (mouse-responsive)
+  - Glassmorphism API cards with Playground/Test Live/Copy URL buttons
+  - 6 API endpoints: Player Info, Ban Check, Profile Card, Send Visits, Send Friend Request, Long Bio
+  - External API base: `https://wotaxxdev-api.vercel.app/`
+  - Features section with glowing cards
+  - Footer with Discord & YouTube links
+- **Components**: ParticleBackground, Header, ApiCard, FeaturesSection, Footer, Notification
+
 ## Key Commands
 
 - `pnpm run typecheck` — full typecheck across all packages

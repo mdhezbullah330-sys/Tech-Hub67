@@ -1,0 +1,31 @@
+kind = "web"
+previewPath = "/"
+title = "Free Fire API Playground"
+version = "1.0.0"
+id = "artifacts/ff-playground"
+router = "path"
+
+[[integratedSkills]]
+name = "react-vite"
+version = "1.0.0"
+
+[[services]]
+name = "web"
+paths = [ "/" ]
+localPort = 21568
+
+[services.development]
+run = "pnpm --filter @workspace/ff-playground run dev"
+
+[services.production]
+build = [ "pnpm", "--filter", "@workspace/ff-playground", "run", "build" ]
+publicDir = "artifacts/ff-playground/dist/public"
+serve = "static"
+
+[[services.production.rewrites]]
+from = "/*"
+to = "/index.html"
+
+[services.env]
+PORT = "21568"
+BASE_PATH = "/"

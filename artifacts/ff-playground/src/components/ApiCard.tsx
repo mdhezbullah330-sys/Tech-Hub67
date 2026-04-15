@@ -1,4 +1,4 @@
-import { useState, useCallback, useRef } from "react";
+import { useState, useCallback, useRef, useEffect } from "react";
 import Notification from "./Notification";
 
 interface ApiParam {
@@ -10,28 +10,40 @@ interface ApiCardProps {
   title: string;
   description: string;
   baseUrl: string;
+  urlTemplate?: string;
   params: ApiParam[];
   responseType: "json" | "image";
+  isActive: boolean;
+  onActivate: () => void;
 }
 
-export default function ApiCard({ title, description, baseUrl, params, responseType }: ApiCardProps) {
-  const [expanded, setExpanded] = useState(false);
+export default function ApiCard({
+  title,
+  description,
+  baseUrl,
+  urlTemplate,
+  params,
+  responseType,
+  isActive,
+  onActivate,
+}: ApiCardProps) {
   const [values, setValues] = useState<Record<string, string>>({});
   const [loading, setLoading] = useState(false);
   const [response, setResponse] = useState<string | null>(null);
   const [imageUrl, setImageUrl] = useState<string | null>(null);
   const [notification, setNotification] = useState<{ message: string; type: "success" | "error" } | null>(null);
 
-  const handleTogglePlayground = () => {
-    if (expanded) {
-      // Collapsing: clear responses
-      setResponse(null);
-      setImageUrl(null);
-    }
-    setExpanded(!expanded);
-  };
   const cardRef = useRef<HTMLDivElement>(null);
   const glowRef = useRef<HTMLDivElement>(null);
+
+  // When collapsed (not active), clear responses and values
+  useEffect(() => {
+    if (!isActive) {
+      setResponse(null);
+      setImageUrl(null);
+      setValues({});
+    }
+  }, [isActive]);
 
   const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
     const card = cardRef.current;
@@ -50,13 +62,36 @@ export default function ApiCard({ title, description, baseUrl, params, responseT
   };
 
   const buildUrl = useCallback(() => {
+    if (urlTemplate) {
+      let url = urlTemplate;
+      params.forEach((p) => {
+        const val = values[p.name] || `{${p.name}}`;
+        url = url.replace(`{${p.name}}`, encodeURIComponent(val));
+      });
+      return url;
+    }
     let url = baseUrl;
     params.forEach((p, i) => {
       const val = values[p.name] || `{${p.name}}`;
       url += `${i === 0 ? "?" : "&"}${p.name}=${encodeURIComponent(val)}`;
     });
     return url;
-  }, [baseUrl, params, values]);
+  }, [baseUrl, urlTemplate, params, values]);
+
+  const buildLiveUrl = useCallback(() => {
+    if (urlTemplate) {
+      let url = urlTemplate;
+      params.forEach((p) => {
+        url = url.replace(`{${p.name}}`, encodeURIComponent(values[p.name] || ""));
+      });
+      return url;
+    }
+    let url = baseUrl;
+    params.forEach((p, i) => {
+      url += `${i === 0 ? "?" : "&"}${p.name}=${encodeURIComponent(values[p.name] || "")}`;
+    });
+    return url;
+  }, [baseUrl, urlTemplate, params, values]);
 
   const handleTestLive = async () => {
     const missing = params.filter((p) => !values[p.name]?.trim());
@@ -70,18 +105,13 @@ export default function ApiCard({ title, description, baseUrl, params, responseT
     setImageUrl(null);
 
     try {
-      let url = baseUrl;
-      params.forEach((p, i) => {
-        url += `${i === 0 ? "?" : "&"}${p.name}=${encodeURIComponent(values[p.name])}`;
-      });
-
+      const url = buildLiveUrl();
       if (responseType === "image") {
         await new Promise((r) => setTimeout(r, 400));
         setImageUrl(url);
         setLoading(false);
         return;
       }
-
       const res = await fetch(url);
       const data = await res.json();
       setResponse(JSON.stringify(data, null, 2));
@@ -109,7 +139,6 @@ export default function ApiCard({ title, description, baseUrl, params, responseT
         onMouseMove={handleMouseMove}
         onMouseLeave={handleMouseLeave}
       >
-        {/* Mouse glow */}
         <div ref={glowRef} className="card-glow" />
 
         <div className="mb-5">
@@ -120,8 +149,8 @@ export default function ApiCard({ title, description, baseUrl, params, responseT
 
         <div className="flex gap-3 flex-wrap">
           <button
-            className={`cyber-btn ${expanded ? "cyber-btn--active" : ""}`}
-            onClick={handleTogglePlayground}
+            className={`cyber-btn ${isActive ? "cyber-btn--active" : ""}`}
+            onClick={onActivate}
           >
             Playground
           </button>
@@ -133,7 +162,7 @@ export default function ApiCard({ title, description, baseUrl, params, responseT
           </button>
         </div>
 
-        {expanded && (
+        {isActive && (
           <div
             className="mt-5 space-y-3"
             style={{ animation: "fadeSlideIn 0.25s ease forwards" }}

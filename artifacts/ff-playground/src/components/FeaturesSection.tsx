@@ -48,7 +48,7 @@ export default function FeaturesSection() {
         className="text-3xl font-bold text-center mb-2"
         style={{
           fontFamily: "'Orbitron', monospace",
-          background: "linear-gradient(135deg, #00f0ff 0%, #00aaff 100%)",
+          background: "linear-gradient(135deg, #c060ff 0%, #8030e0 100%)",
           WebkitBackgroundClip: "text",
           WebkitTextFillColor: "transparent",
           backgroundClip: "text",
@@ -59,7 +59,7 @@ export default function FeaturesSection() {
       </h2>
       <p
         className="text-center mb-12 text-xs tracking-widest uppercase"
-        style={{ color: "rgba(0, 240, 255, 0.3)", fontFamily: "'Space Grotesk', sans-serif" }}
+        style={{ color: "rgba(190, 80, 255, 0.3)", fontFamily: "'Space Grotesk', sans-serif" }}
       >
         Built for speed, security, and scalability
       </p>
@@ -72,13 +72,13 @@ export default function FeaturesSection() {
             </div>
             <h3
               className="text-base font-semibold mb-2"
-              style={{ color: "rgba(0, 240, 255, 0.85)", fontFamily: "'Space Grotesk', sans-serif" }}
+              style={{ color: "rgba(190, 80, 255, 0.85)", fontFamily: "'Space Grotesk', sans-serif" }}
             >
               {f.title}
             </h3>
             <p
               className="text-xs leading-relaxed"
-              style={{ color: "rgba(0, 240, 255, 0.4)", fontFamily: "'Space Grotesk', sans-serif" }}
+              style={{ color: "rgba(190, 80, 255, 0.4)", fontFamily: "'Space Grotesk', sans-serif" }}
             >
               {f.desc}
             </p>

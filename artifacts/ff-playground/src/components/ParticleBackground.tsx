@@ -74,7 +74,7 @@ export default function ParticleBackground() {
         // Draw particle
         ctx!.beginPath();
         ctx!.arc(p.x, p.y, p.size, 0, Math.PI * 2);
-        ctx!.fillStyle = `rgba(0, 240, 255, ${p.opacity})`;
+        ctx!.fillStyle = `rgba(190, 80, 255, ${p.opacity})`;
         ctx!.fill();
 
         // Draw connections
@@ -90,7 +90,7 @@ export default function ParticleBackground() {
             ctx!.beginPath();
             ctx!.moveTo(p.x, p.y);
             ctx!.lineTo(p2.x, p2.y);
-            ctx!.strokeStyle = `rgba(0, 240, 255, ${alpha})`;
+            ctx!.strokeStyle = `rgba(190, 80, 255, ${alpha})`;
             ctx!.lineWidth = 0.4;
             ctx!.stroke();
           }

@@ -15,21 +15,34 @@ export default function LoginPage({ onSuccess }: LoginPageProps) {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [catState, setCatState] = useState<CatState>("idle");
+  const [catSpeech, setCatSpeech] = useState<string | null>(null);
   const [error, setError] = useState("");
   const [shaking, setShaking] = useState(false);
   const [phase, setPhase] = useState<"form" | "dancing" | "exiting">("form");
-  const idleTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
-  const clearIdle = useCallback(() => {
-    if (idleTimerRef.current) clearTimeout(idleTimerRef.current);
+  const userIdleRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const passIdleRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const speechTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  const clearSpeech = useCallback((delay = 3000) => {
+    if (speechTimerRef.current) clearTimeout(speechTimerRef.current);
+    speechTimerRef.current = setTimeout(() => {
+      setCatSpeech(null);
+      setCatState("idle");
+    }, delay);
   }, []);
 
-  const startIdle = useCallback(() => {
-    clearIdle();
-    idleTimerRef.current = setTimeout(() => setCatState("speech"), 3000);
-  }, [clearIdle]);
+  const showSpeech = useCallback((msg: string, catS: CatState = "speech") => {
+    setCatSpeech(msg);
+    setCatState(catS);
+    clearSpeech(3000);
+  }, [clearSpeech]);
 
-  useEffect(() => () => clearIdle(), [clearIdle]);
+  useEffect(() => () => {
+    if (userIdleRef.current) clearTimeout(userIdleRef.current);
+    if (passIdleRef.current) clearTimeout(passIdleRef.current);
+    if (speechTimerRef.current) clearTimeout(speechTimerRef.current);
+  }, []);
 
   const triggerShake = () => {
     setShaking(true);
@@ -41,8 +54,9 @@ export default function LoginPage({ onSuccess }: LoginPageProps) {
     setError("");
 
     if (!username.trim() || !password.trim()) {
-      setError("Please fill in all fields.");
+      setError("Both fields are required.");
       triggerShake();
+      showSpeech("Both fields are required!", "speech");
       return;
     }
 
@@ -66,11 +80,11 @@ export default function LoginPage({ onSuccess }: LoginPageProps) {
         setError("Wrong credentials. Try again.");
         triggerShake();
         setCatState("idle");
+        showSpeech("Hmm... that's not right!", "speech");
         return;
       }
     }
 
-    // Dance → transition
     setCatState("dance");
     setPhase("dancing");
     setTimeout(() => {
@@ -86,12 +100,10 @@ export default function LoginPage({ onSuccess }: LoginPageProps) {
     <div className="login-page-root">
       <ParticleBackground />
 
-      {/* Scratch Intro */}
       <AnimatePresence>
         {!introOver && <ScratchIntro onDone={() => setIntroOver(true)} />}
       </AnimatePresence>
 
-      {/* Login UI */}
       <AnimatePresence>
         {introOver && phase !== "exiting" && (
           <motion.div
@@ -102,15 +114,11 @@ export default function LoginPage({ onSuccess }: LoginPageProps) {
             exit={{ opacity: 0, scale: 1.05 }}
             transition={{ duration: 0.55, ease: [0.16, 1, 0.3, 1] }}
           >
-            {/* Glassmorphism card */}
             <motion.div
               className="login-card"
-              animate={shaking ? {
-                x: [-12, 12, -10, 10, -6, 6, -3, 3, 0],
-              } : { x: 0 }}
+              animate={shaking ? { x: [-12, 12, -10, 10, -6, 6, -3, 3, 0] } : { x: 0 }}
               transition={shaking ? { duration: 0.55, ease: "easeInOut" } : {}}
             >
-              {/* Top glow line */}
               <div className="login-card-glow-line" />
 
               {/* Cat */}
@@ -118,8 +126,8 @@ export default function LoginPage({ onSuccess }: LoginPageProps) {
                 {phase === "dancing" ? (
                   <motion.div
                     key="cat-center"
-                    initial={{ opacity: 0, scale: 0.6, x: 0 }}
-                    animate={{ opacity: 1, scale: 1.15, x: 0 }}
+                    initial={{ opacity: 0, scale: 0.6 }}
+                    animate={{ opacity: 1, scale: 1.15 }}
                     transition={{ type: "spring", stiffness: 260, damping: 18 }}
                     style={{ width: "100%", display: "flex", justifyContent: "center" }}
                   >
@@ -132,7 +140,52 @@ export default function LoginPage({ onSuccess }: LoginPageProps) {
                     animate={{ opacity: 1, x: 0 }}
                     transition={{ delay: 0.1, duration: 0.4 }}
                     className="cat-slot"
+                    style={{ position: "relative" }}
                   >
+                    {/* Custom speech bubble for cat */}
+                    <AnimatePresence>
+                      {catSpeech && (
+                        <motion.div
+                          key="cat-speech"
+                          initial={{ opacity: 0, scale: 0.7, y: 6 }}
+                          animate={{ opacity: 1, scale: 1, y: 0 }}
+                          exit={{ opacity: 0, scale: 0.8 }}
+                          transition={{ type: "spring", stiffness: 400, damping: 22 }}
+                          style={{
+                            position: "absolute",
+                            bottom: "calc(100% + 4px)",
+                            left: "50%",
+                            transform: "translateX(-50%)",
+                            background: "rgba(5, 2, 16, 0.92)",
+                            backdropFilter: "blur(10px)",
+                            border: "0.5px solid rgba(190, 80, 255, 0.4)",
+                            borderRadius: "12px",
+                            padding: "8px 14px",
+                            whiteSpace: "nowrap",
+                            fontFamily: "'Space Grotesk', sans-serif",
+                            fontSize: "0.7rem",
+                            fontWeight: 700,
+                            color: "rgba(200, 120, 255, 0.95)",
+                            letterSpacing: "0.02em",
+                            zIndex: 30,
+                            boxShadow: "0 6px 24px rgba(0,0,0,0.5), 0 0 14px rgba(190,80,255,0.1)",
+                            pointerEvents: "none",
+                          }}
+                        >
+                          {catSpeech}
+                          <div style={{
+                            position: "absolute",
+                            bottom: -6,
+                            left: "50%",
+                            transform: "translateX(-50%)",
+                            width: 0, height: 0,
+                            borderLeft: "6px solid transparent",
+                            borderRight: "6px solid transparent",
+                            borderTop: "6px solid rgba(190, 80, 255, 0.4)",
+                          }} />
+                        </motion.div>
+                      )}
+                    </AnimatePresence>
                     <AnimeCat state={catState} />
                   </motion.div>
                 )}
@@ -149,7 +202,6 @@ export default function LoginPage({ onSuccess }: LoginPageProps) {
                     exit={{ opacity: 0, x: 16 }}
                     transition={{ delay: 0.15, duration: 0.4 }}
                   >
-                    {/* Toggle */}
                     <div className="mode-toggle">
                       {(["login", "signup"] as const).map((m) => (
                         <button
@@ -163,23 +215,19 @@ export default function LoginPage({ onSuccess }: LoginPageProps) {
                       ))}
                     </div>
 
-                    <motion.h2
-                      className="login-title"
-                      key={mode}
-                      initial={{ opacity: 0, y: -8 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      transition={{ duration: 0.3 }}
-                    >
-                      {mode === "login" ? "Welcome Back" : "Create Account"}
-                    </motion.h2>
-                    {mode === "signup" && (
-                      <motion.p
-                        className="login-subtitle"
-                        initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.3 }}
-                      >
-                        Join the Free Fire Developer Community
-                      </motion.p>
-                    )}
+                    <motion.div key={mode} initial={{ opacity: 0, y: -8 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.3 }}>
+                      {mode === "login" ? (
+                        <>
+                          <h2 className="login-title">Welcome Back 👋</h2>
+                          <p className="login-subtitle">Great to see you again. Sign in to access the Playground.</p>
+                        </>
+                      ) : (
+                        <>
+                          <h2 className="login-title">Join the Community ✨</h2>
+                          <p className="login-subtitle">Create your account and unlock the full Free Fire API toolkit.</p>
+                        </>
+                      )}
+                    </motion.div>
 
                     <form onSubmit={handleSubmit} className="login-form" noValidate>
                       <div className="login-field">
@@ -193,12 +241,21 @@ export default function LoginPage({ onSuccess }: LoginPageProps) {
                           onChange={(e) => {
                             setUsername(e.target.value);
                             setError("");
-                            clearIdle();
+                            if (userIdleRef.current) clearTimeout(userIdleRef.current);
                             setCatState("smile");
-                            startIdle();
+                            setCatSpeech(null);
                           }}
-                          onFocus={() => { setCatState("smile"); startIdle(); }}
-                          onBlur={() => { clearIdle(); if (catState === "smile" || catState === "speech") setCatState("idle"); }}
+                          onFocus={() => {
+                            setCatState("smile");
+                            if (userIdleRef.current) clearTimeout(userIdleRef.current);
+                            userIdleRef.current = setTimeout(() => {
+                              if (!username.trim()) showSpeech("Hey! Enter your username here!");
+                            }, 3000);
+                          }}
+                          onBlur={() => {
+                            if (userIdleRef.current) clearTimeout(userIdleRef.current);
+                            if (catState === "smile" || catState === "speech") setCatState("idle");
+                          }}
                         />
                       </div>
 
@@ -210,9 +267,24 @@ export default function LoginPage({ onSuccess }: LoginPageProps) {
                           placeholder="Enter your password"
                           value={password}
                           autoComplete={mode === "login" ? "current-password" : "new-password"}
-                          onChange={(e) => { setPassword(e.target.value); setError(""); }}
-                          onFocus={() => { clearIdle(); setCatState("laugh"); }}
-                          onBlur={() => setCatState("idle")}
+                          onChange={(e) => {
+                            setPassword(e.target.value);
+                            setError("");
+                            if (passIdleRef.current) clearTimeout(passIdleRef.current);
+                            setCatState("laugh");
+                            setCatSpeech(null);
+                          }}
+                          onFocus={() => {
+                            setCatState("laugh");
+                            if (passIdleRef.current) clearTimeout(passIdleRef.current);
+                            passIdleRef.current = setTimeout(() => {
+                              if (!password.trim()) showSpeech("Don't forget your password!", "laugh");
+                            }, 6000);
+                          }}
+                          onBlur={() => {
+                            if (passIdleRef.current) clearTimeout(passIdleRef.current);
+                            setCatState("idle");
+                          }}
                         />
                       </div>
 
@@ -231,7 +303,7 @@ export default function LoginPage({ onSuccess }: LoginPageProps) {
                       </AnimatePresence>
 
                       <button className="login-submit" type="submit">
-                        {mode === "login" ? "Login" : "Sign Up"}
+                        {mode === "login" ? "Login" : "Create Account"}
                       </button>
                     </form>
                   </motion.div>
@@ -251,14 +323,21 @@ export default function LoginPage({ onSuccess }: LoginPageProps) {
               </AnimatePresence>
             </motion.div>
 
-            {/* Brand */}
             <motion.div
               className="login-brand"
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.3, duration: 0.5 }}
             >
-              <span className="login-brand-title">TALHA</span>
+              <img
+                src="/talha-logo.png"
+                alt="TALHA"
+                style={{
+                  height: "44px",
+                  width: "auto",
+                  filter: "drop-shadow(0 0 14px rgba(190, 80, 255, 0.5))",
+                }}
+              />
               <span className="login-brand-sub">API Playground &mdash; Security Gate</span>
             </motion.div>
           </motion.div>

@@ -71,7 +71,7 @@ export default function ScratchIntro({ onDone }: ScratchIntroProps) {
           >
             <defs>
               <pattern id="grid" width="40" height="40" patternUnits="userSpaceOnUse">
-                <path d="M 40 0 L 0 0 0 40" fill="none" stroke="#00f0ff" strokeWidth="0.5" />
+                <path d="M 40 0 L 0 0 0 40" fill="none" stroke="#c060ff" strokeWidth="0.5" />
               </pattern>
             </defs>
             <rect width="100%" height="100%" fill="url(#grid)" />
@@ -97,7 +97,7 @@ export default function ScratchIntro({ onDone }: ScratchIntroProps) {
                 key={i}
                 d={d}
                 fill="none"
-                stroke={i % 2 === 0 ? "rgba(0,240,255,0.7)" : "rgba(160,80,255,0.65)"}
+                stroke={i % 2 === 0 ? "rgba(190,80,255,0.7)" : "rgba(160,80,255,0.65)"}
                 strokeWidth={1.5}
                 strokeLinecap="round"
                 filter="url(#glow)"
@@ -156,7 +156,7 @@ export default function ScratchIntro({ onDone }: ScratchIntroProps) {
               fontSize: "0.75rem",
               letterSpacing: "0.25em",
               textTransform: "uppercase",
-              color: "rgba(0,240,255,0.4)",
+              color: "rgba(190,80,255,0.4)",
             }}
             animate={{ opacity: [0.3, 0.8, 0.3] }}
             transition={{ duration: 1.2, repeat: Infinity }}
@@ -174,28 +174,28 @@ function ScratchCat({ scratchCount }: { pawX: number; pawY: number; scratchCount
   return (
     <svg viewBox="0 0 200 220" width="220" height="220" xmlns="http://www.w3.org/2000/svg" style={{ overflow: "visible" }}>
       {/* Body */}
-      <ellipse cx="100" cy="158" rx="44" ry="40" fill="rgba(4,12,28,0.9)" stroke="rgba(0,240,255,0.2)" strokeWidth="0.8" />
+      <ellipse cx="100" cy="158" rx="44" ry="40" fill="rgba(4,12,28,0.9)" stroke="rgba(190,80,255,0.2)" strokeWidth="0.8" />
       {/* Head */}
-      <ellipse cx="100" cy="88" rx="40" ry="37" fill="rgba(4,12,28,0.9)" stroke="rgba(0,240,255,0.2)" strokeWidth="0.8" />
+      <ellipse cx="100" cy="88" rx="40" ry="37" fill="rgba(4,12,28,0.9)" stroke="rgba(190,80,255,0.2)" strokeWidth="0.8" />
       {/* Ears */}
-      <polygon points="70,58 78,24 96,56" fill="rgba(4,12,28,0.95)" stroke="rgba(0,240,255,0.25)" strokeWidth="0.8" />
-      <polygon points="75,54 81,34 93,53" fill="rgba(0,240,255,0.06)" />
-      <polygon points="130,58 122,24 104,56" fill="rgba(4,12,28,0.95)" stroke="rgba(0,240,255,0.25)" strokeWidth="0.8" />
-      <polygon points="125,54 119,34 107,53" fill="rgba(0,240,255,0.06)" />
+      <polygon points="70,58 78,24 96,56" fill="rgba(4,12,28,0.95)" stroke="rgba(190,80,255,0.25)" strokeWidth="0.8" />
+      <polygon points="75,54 81,34 93,53" fill="rgba(190,80,255,0.06)" />
+      <polygon points="130,58 122,24 104,56" fill="rgba(4,12,28,0.95)" stroke="rgba(190,80,255,0.25)" strokeWidth="0.8" />
+      <polygon points="125,54 119,34 107,53" fill="rgba(190,80,255,0.06)" />
 
       {/* Eyes - angry/determined while scratching */}
       {isScratching ? (
         <>
           {/* Furrowed angry eyes */}
-          <path d="M76 74 Q84 70 92 74" fill="none" stroke="rgba(0,240,255,0.4)" strokeWidth="1.2" />
-          <path d="M108 74 Q116 70 124 74" fill="none" stroke="rgba(0,240,255,0.4)" strokeWidth="1.2" />
+          <path d="M76 74 Q84 70 92 74" fill="none" stroke="rgba(190,80,255,0.4)" strokeWidth="1.2" />
+          <path d="M108 74 Q116 70 124 74" fill="none" stroke="rgba(190,80,255,0.4)" strokeWidth="1.2" />
           <ellipse cx="84" cy="77" rx="6" ry="6" fill="rgba(200,230,255,0.9)" />
           <ellipse cx="116" cy="77" rx="6" ry="6" fill="rgba(200,230,255,0.9)" />
           <ellipse cx="85" cy="78" rx="3.5" ry="4.5" fill="rgba(4,12,28,0.95)" />
           <ellipse cx="117" cy="78" rx="3.5" ry="4.5" fill="rgba(4,12,28,0.95)" />
           {/* Angry eyebrows */}
-          <line x1="74" y1="70" x2="90" y2="73" stroke="rgba(0,240,255,0.6)" strokeWidth="1.5" strokeLinecap="round" />
-          <line x1="110" y1="73" x2="126" y2="70" stroke="rgba(0,240,255,0.6)" strokeWidth="1.5" strokeLinecap="round" />
+          <line x1="74" y1="70" x2="90" y2="73" stroke="rgba(190,80,255,0.6)" strokeWidth="1.5" strokeLinecap="round" />
+          <line x1="110" y1="73" x2="126" y2="70" stroke="rgba(190,80,255,0.6)" strokeWidth="1.5" strokeLinecap="round" />
         </>
       ) : (
         <>
@@ -213,16 +213,16 @@ function ScratchCat({ scratchCount }: { pawX: number; pawY: number; scratchCount
 
       {/* Mouth - grin while scratching */}
       {isScratching ? (
-        <path d="M88 98 Q100 108 112 98" fill="none" stroke="rgba(0,240,255,0.7)" strokeWidth="1.5" strokeLinecap="round" />
+        <path d="M88 98 Q100 108 112 98" fill="none" stroke="rgba(190,80,255,0.7)" strokeWidth="1.5" strokeLinecap="round" />
       ) : (
         <path d="M94 98 Q100 103 106 98" fill="none" stroke="rgba(200,230,255,0.5)" strokeWidth="1.2" strokeLinecap="round" />
       )}
 
       {/* Whiskers */}
-      <line x1="58" y1="93" x2="90" y2="95" stroke="rgba(0,240,255,0.25)" strokeWidth="0.8" />
-      <line x1="58" y1="97" x2="90" y2="97" stroke="rgba(0,240,255,0.25)" strokeWidth="0.8" />
-      <line x1="110" y1="95" x2="142" y2="93" stroke="rgba(0,240,255,0.25)" strokeWidth="0.8" />
-      <line x1="110" y1="97" x2="142" y2="97" stroke="rgba(0,240,255,0.25)" strokeWidth="0.8" />
+      <line x1="58" y1="93" x2="90" y2="95" stroke="rgba(190,80,255,0.25)" strokeWidth="0.8" />
+      <line x1="58" y1="97" x2="90" y2="97" stroke="rgba(190,80,255,0.25)" strokeWidth="0.8" />
+      <line x1="110" y1="95" x2="142" y2="93" stroke="rgba(190,80,255,0.25)" strokeWidth="0.8" />
+      <line x1="110" y1="97" x2="142" y2="97" stroke="rgba(190,80,255,0.25)" strokeWidth="0.8" />
 
       {/* Left arm raised for scratching */}
       <motion.g
@@ -234,19 +234,19 @@ function ScratchCat({ scratchCount }: { pawX: number; pawY: number; scratchCount
         transition={{ duration: 0.45, repeat: Infinity, ease: "easeInOut" }}
         style={{ transformOrigin: "60px 130px" }}
       >
-        <path d="M62 128 Q30 100 20 72" fill="none" stroke="rgba(0,200,220,0.65)" strokeWidth="9" strokeLinecap="round" />
+        <path d="M62 128 Q30 100 20 72" fill="none" stroke="rgba(150,55,210,0.65)" strokeWidth="9" strokeLinecap="round" />
         {/* Claws */}
-        <path d="M20 72 L12 60 M20 72 L18 58 M20 72 L26 61" stroke="rgba(0,240,255,0.8)" strokeWidth="1.5" strokeLinecap="round" />
+        <path d="M20 72 L12 60 M20 72 L18 58 M20 72 L26 61" stroke="rgba(190,80,255,0.8)" strokeWidth="1.5" strokeLinecap="round" />
       </motion.g>
 
       {/* Right arm */}
-      <path d="M138 128 Q155 145 150 165" fill="none" stroke="rgba(0,200,220,0.5)" strokeWidth="8" strokeLinecap="round" />
+      <path d="M138 128 Q155 145 150 165" fill="none" stroke="rgba(150,55,210,0.5)" strokeWidth="8" strokeLinecap="round" />
 
       {/* Tail */}
       <motion.path
         d="M148 155 Q178 138 172 112 Q168 95 155 100"
         fill="none"
-        stroke="rgba(0,200,220,0.6)"
+        stroke="rgba(150,55,210,0.6)"
         strokeWidth="8"
         strokeLinecap="round"
         animate={{ d: [
@@ -258,13 +258,13 @@ function ScratchCat({ scratchCount }: { pawX: number; pawY: number; scratchCount
       />
 
       {/* Paws */}
-      <ellipse cx="72" cy="188" rx="15" ry="9" fill="rgba(4,12,28,0.85)" stroke="rgba(0,240,255,0.15)" strokeWidth="0.6" />
-      <ellipse cx="128" cy="188" rx="15" ry="9" fill="rgba(4,12,28,0.85)" stroke="rgba(0,240,255,0.15)" strokeWidth="0.6" />
+      <ellipse cx="72" cy="188" rx="15" ry="9" fill="rgba(4,12,28,0.85)" stroke="rgba(190,80,255,0.15)" strokeWidth="0.6" />
+      <ellipse cx="128" cy="188" rx="15" ry="9" fill="rgba(4,12,28,0.85)" stroke="rgba(190,80,255,0.15)" strokeWidth="0.6" />
 
       {/* Scratch particle effects */}
       {scratchCount >= 2 && (
         <>
-          <motion.circle cx="25" cy="70" r="2" fill="rgba(0,240,255,0.7)"
+          <motion.circle cx="25" cy="70" r="2" fill="rgba(190,80,255,0.7)"
             animate={{ scale: [1, 1.5, 0], opacity: [1, 0.8, 0] }}
             transition={{ duration: 0.4, repeat: Infinity, repeatDelay: 0.3 }}
           />
@@ -272,7 +272,7 @@ function ScratchCat({ scratchCount }: { pawX: number; pawY: number; scratchCount
             animate={{ scale: [1, 2, 0], opacity: [1, 0.6, 0] }}
             transition={{ duration: 0.35, repeat: Infinity, repeatDelay: 0.4, delay: 0.1 }}
           />
-          <motion.circle cx="15" cy="78" r="1" fill="rgba(0,240,255,0.5)"
+          <motion.circle cx="15" cy="78" r="1" fill="rgba(190,80,255,0.5)"
             animate={{ scale: [1, 1.8, 0], opacity: [1, 0.5, 0] }}
             transition={{ duration: 0.5, repeat: Infinity, repeatDelay: 0.25, delay: 0.2 }}
           />

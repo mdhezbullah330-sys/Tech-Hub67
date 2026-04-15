@@ -1,0 +1,35 @@
+4. Content Protection (Security):
+
+Disable Right-Click, Ctrl+Shift+I, Ctrl+U, and F12 across the entire website.
+
+If a user tries any of these actions, show a stylish, animated toast notification on the right side saying: "Content Protected: This action is not allowed by the owner." include a shield/lock animated icon. This message should vanish after 3 seconds.
+
+5. New API Endpoints Addition:
+
+Add the following cards to the playground with their respective titles, descriptions, and inputs:
+
+Generate JWT: "Generate JWT token from access token" -> URL: https://wotaxxdev-api.vercel.app/access-jwt?access_token={accesstoken}
+
+Send Friend Request (Access/JWT): "Send friend request using token and UID" -> URL: https://wotaxxdev-api.vercel.app/add?token={token}&uid={uid}
+
+Add Items: "Add items using access/eat token and item IDs" -> URL: https://wotaxxdev-api.vercel.app/add-items?access_token={accesstoken}&item_ids={ids}
+
+Change Nickname: "Change nickname using access/eat token" -> URL: https://wotaxxdev-api.vercel.app/change?token={token}&newname={newname}
+
+Access Token: "Get access token from eat token" -> URL: https://wotaxxdev-api.vercel.app/get-access/{token}
+
+Fetch Outfit: "Show player Outfit and character" (IMAGE Response) -> URL: https://wotaxxdev-api.vercel.app/profile?uid={uid}
+
+Remove Friend: "Remove friend using access token or JWT" -> URL: https://wotaxxdev-api.vercel.app/remove?token={token}&uid={uid}
+
+Search Player: "Search for players by nickname across all regions" -> URL: https://wotaxxdev-api.vercel.app/searchplayer?name={nickname}
+
+Search Clan: "Search for clans by name across all regions" -> URL: https://wotaxxdev-api.vercel.app/searchclan?name={clanname}
+
+6. Login Page & Visual Overhaul:
+
+Upgrade the "WELCOME BACK" and "SIGN UP" text with more welcoming, multi-line greetings.
+
+Make the entire background, particle effects, and card animations even more "cinematic" and professional. Use the new purple glow theme for all hover effects and shadows.
+
+Ensure all components are fully responsive and optimized for Vercel deployment.

@@ -14,79 +14,82 @@ export default function SecurityToast({ visible, onDone }: SecurityToastProps) {
       if (timerRef.current) clearTimeout(timerRef.current);
       timerRef.current = setTimeout(onDone, 3000);
     }
-    return () => {
-      if (timerRef.current) clearTimeout(timerRef.current);
-    };
+    return () => { if (timerRef.current) clearTimeout(timerRef.current); };
   }, [visible, onDone]);
 
   return (
     <AnimatePresence>
       {visible && (
         <motion.div
-          initial={{ opacity: 0, x: 60, scale: 0.92 }}
+          initial={{ opacity: 0, x: 80, scale: 0.9 }}
           animate={{ opacity: 1, x: 0, scale: 1 }}
-          exit={{ opacity: 0, x: 60, scale: 0.9 }}
-          transition={{ type: "spring", stiffness: 340, damping: 26 }}
+          exit={{ opacity: 0, x: 80, scale: 0.9 }}
+          transition={{ type: "spring", stiffness: 360, damping: 28 }}
           style={{
             position: "fixed",
-            top: "24px",
+            bottom: "24px",
             right: "24px",
             zIndex: 9999,
             display: "flex",
             alignItems: "flex-start",
-            gap: "14px",
-            background: "rgba(6, 2, 16, 0.88)",
-            backdropFilter: "blur(18px)",
-            border: "0.5px solid rgba(190, 80, 255, 0.35)",
+            gap: "13px",
+            background: "rgba(10, 2, 4, 0.94)",
+            backdropFilter: "blur(22px)",
             borderRadius: "16px",
-            padding: "16px 20px",
-            maxWidth: "340px",
-            boxShadow: "0 24px 60px rgba(0,0,0,0.55), 0 0 0 0.5px rgba(190,80,255,0.15), 0 0 28px rgba(190,80,255,0.08)",
+            padding: "16px 20px 14px",
+            maxWidth: "320px",
+            border: "0.5px solid rgba(255, 60, 90, 0.4)",
+            boxShadow: "0 0 0 1px rgba(255, 60, 90, 0.08), 0 24px 60px rgba(0,0,0,0.6)",
+            animation: "securityPulse 1.2s ease-in-out infinite",
           }}
         >
-          {/* Shield Icon */}
+          {/* Animated shield */}
           <motion.div
-            animate={{ scale: [1, 1.15, 1], rotate: [0, -4, 4, 0] }}
-            transition={{ duration: 0.7, repeat: 3, ease: "easeInOut" }}
+            animate={{
+              scale: [1, 1.18, 1, 1.12, 1],
+              rotate: [0, -6, 6, -4, 0],
+            }}
+            transition={{ duration: 0.8, repeat: Infinity, repeatDelay: 0.6 }}
             style={{
               flexShrink: 0,
-              width: 38,
-              height: 38,
+              width: 40,
+              height: 40,
               borderRadius: "10px",
-              background: "rgba(190, 80, 255, 0.1)",
-              border: "0.5px solid rgba(190, 80, 255, 0.3)",
+              background: "rgba(255, 50, 80, 0.12)",
+              border: "0.5px solid rgba(255, 60, 90, 0.4)",
               display: "flex",
               alignItems: "center",
               justifyContent: "center",
-              fontSize: "18px",
+              fontSize: "19px",
+              boxShadow: "0 0 18px rgba(255, 50, 80, 0.3)",
             }}
           >
             🛡️
           </motion.div>
 
-          <div>
+          <div style={{ flex: 1 }}>
             <p style={{
-              fontFamily: "'Space Grotesk', sans-serif",
+              fontFamily: "'Orbitron', monospace",
               fontWeight: 700,
-              fontSize: "0.8rem",
-              letterSpacing: "0.06em",
+              fontSize: "0.72rem",
+              letterSpacing: "0.1em",
               textTransform: "uppercase",
-              color: "rgba(190, 80, 255, 0.95)",
-              margin: "0 0 4px 0",
+              color: "rgba(255, 100, 120, 0.95)",
+              margin: "0 0 3px 0",
             }}>
               Content Protected
             </p>
             <p style={{
               fontFamily: "'Space Grotesk', sans-serif",
-              fontSize: "0.75rem",
-              color: "rgba(200, 160, 255, 0.65)",
+              fontSize: "0.73rem",
+              color: "rgba(255, 160, 175, 0.65)",
               margin: 0,
               lineHeight: 1.5,
             }}>
               This action is not allowed by the owner.
             </p>
 
-            {/* Progress bar */}
+            {/* Progress drain bar */}
             <motion.div
               initial={{ width: "100%" }}
               animate={{ width: "0%" }}
@@ -95,10 +98,24 @@ export default function SecurityToast({ visible, onDone }: SecurityToastProps) {
                 marginTop: "10px",
                 height: "2px",
                 borderRadius: "2px",
-                background: "linear-gradient(90deg, rgba(190,80,255,0.8), rgba(140,40,200,0.4))",
+                background: "linear-gradient(90deg, rgba(255,60,90,0.9), rgba(200,30,60,0.4))",
+                boxShadow: "0 0 6px rgba(255,60,90,0.5)",
               }}
             />
           </div>
+
+          {/* Pulsing red border glow overlay */}
+          <motion.div
+            animate={{ opacity: [0, 0.6, 0] }}
+            transition={{ duration: 1.2, repeat: Infinity }}
+            style={{
+              position: "absolute",
+              inset: 0,
+              borderRadius: "16px",
+              border: "1px solid rgba(255, 60, 90, 0.5)",
+              pointerEvents: "none",
+            }}
+          />
         </motion.div>
       )}
     </AnimatePresence>

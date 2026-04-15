@@ -1,4 +1,4 @@
-import { useState, useCallback, useRef, useEffect } from "react";
+import { useState, useCallback, useRef } from "react";
 import Notification from "./Notification";
 
 interface ApiParam {
@@ -13,8 +13,6 @@ interface ApiCardProps {
   urlTemplate?: string;
   params: ApiParam[];
   responseType: "json" | "image";
-  isActive: boolean;
-  onActivate: () => void;
 }
 
 export default function ApiCard({
@@ -24,9 +22,8 @@ export default function ApiCard({
   urlTemplate,
   params,
   responseType,
-  isActive,
-  onActivate,
 }: ApiCardProps) {
+  const [expanded, setExpanded] = useState(false);
   const [values, setValues] = useState<Record<string, string>>({});
   const [loading, setLoading] = useState(false);
   const [response, setResponse] = useState<string | null>(null);
@@ -36,24 +33,22 @@ export default function ApiCard({
   const cardRef = useRef<HTMLDivElement>(null);
   const glowRef = useRef<HTMLDivElement>(null);
 
-  // When collapsed (not active), clear responses and values
-  useEffect(() => {
-    if (!isActive) {
+  const handleTogglePlayground = () => {
+    if (expanded) {
       setResponse(null);
       setImageUrl(null);
       setValues({});
     }
-  }, [isActive]);
+    setExpanded(!expanded);
+  };
 
   const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
     const card = cardRef.current;
     const glow = glowRef.current;
     if (!card || !glow) return;
     const rect = card.getBoundingClientRect();
-    const x = e.clientX - rect.left;
-    const y = e.clientY - rect.top;
-    glow.style.left = `${x}px`;
-    glow.style.top = `${y}px`;
+    glow.style.left = `${e.clientX - rect.left}px`;
+    glow.style.top = `${e.clientY - rect.top}px`;
     glow.style.opacity = "1";
   };
 
@@ -65,15 +60,13 @@ export default function ApiCard({
     if (urlTemplate) {
       let url = urlTemplate;
       params.forEach((p) => {
-        const val = values[p.name] || `{${p.name}}`;
-        url = url.replace(`{${p.name}}`, encodeURIComponent(val));
+        url = url.replace(`{${p.name}}`, encodeURIComponent(values[p.name] || `{${p.name}}`));
       });
       return url;
     }
     let url = baseUrl;
     params.forEach((p, i) => {
-      const val = values[p.name] || `{${p.name}}`;
-      url += `${i === 0 ? "?" : "&"}${p.name}=${encodeURIComponent(val)}`;
+      url += `${i === 0 ? "?" : "&"}${p.name}=${encodeURIComponent(values[p.name] || `{${p.name}}`)}`;
     });
     return url;
   }, [baseUrl, urlTemplate, params, values]);
@@ -99,11 +92,9 @@ export default function ApiCard({
       setNotification({ message: "Please fill in all parameters", type: "error" });
       return;
     }
-
     setLoading(true);
     setResponse(null);
     setImageUrl(null);
-
     try {
       const url = buildLiveUrl();
       if (responseType === "image") {
@@ -123,9 +114,8 @@ export default function ApiCard({
   };
 
   const handleCopyUrl = () => {
-    const url = buildUrl();
-    navigator.clipboard.writeText(url)
-      .then(() => setNotification({ message: "Successfully copied to clipboard!", type: "success" }))
+    navigator.clipboard.writeText(buildUrl())
+      .then(() => setNotification({ message: "URL copied to clipboard!", type: "success" }))
       .catch(() => setNotification({ message: "Failed to copy URL", type: "error" }));
   };
 
@@ -149,8 +139,8 @@ export default function ApiCard({
 
         <div className="flex gap-3 flex-wrap">
           <button
-            className={`cyber-btn ${isActive ? "cyber-btn--active" : ""}`}
-            onClick={onActivate}
+            className={`cyber-btn ${expanded ? "cyber-btn--active" : ""}`}
+            onClick={handleTogglePlayground}
           >
             Playground
           </button>
@@ -162,11 +152,8 @@ export default function ApiCard({
           </button>
         </div>
 
-        {isActive && (
-          <div
-            className="mt-5 space-y-3"
-            style={{ animation: "fadeSlideIn 0.25s ease forwards" }}
-          >
+        {expanded && (
+          <div className="mt-5 space-y-3" style={{ animation: "fadeSlideIn 0.25s ease forwards" }}>
             {params.map((p) => (
               <input
                 key={p.name}
@@ -181,19 +168,14 @@ export default function ApiCard({
 
         {loading && (
           <div className="mt-5 flex items-center gap-4" style={{ animation: "fadeSlideIn 0.2s ease" }}>
-            <div className="pulse-ring">
-              <div className="pulse-dot" />
-            </div>
+            <div className="pulse-ring"><div className="pulse-dot" /></div>
             <span className="loading-text">Fetching Data...</span>
           </div>
         )}
 
         {imageUrl && !loading && (
           <div className="response-box mt-5 flex items-center justify-center">
-            <img
-              src={imageUrl}
-              alt="API Response"
-              className="max-w-full rounded-lg"
+            <img src={imageUrl} alt="API Response" className="max-w-full rounded-lg"
               onError={() => {
                 setImageUrl(null);
                 setResponse(JSON.stringify({ error: "Failed to load image" }, null, 2));
@@ -208,9 +190,7 @@ export default function ApiCard({
           </div>
         )}
 
-        {!hasResponse && !loading && (
-          <div style={{ height: "0" }} />
-        )}
+        {!hasResponse && !loading && <div style={{ height: 0 }} />}
       </div>
 
       {notification && (

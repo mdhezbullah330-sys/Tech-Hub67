@@ -52,7 +52,7 @@ const apiEndpoints = [
   },
   {
     title: "Long Bio",
-    description: "Update player bio using access token and new bio text",
+    description: "Update player bio using access token and bio text",
     baseUrl: "https://wotaxxdev-api.vercel.app/update_bio",
     params: [
       { name: "access_token", placeholder: "accesstoken — Your Access Token" },
@@ -136,23 +136,29 @@ const apiEndpoints = [
     params: [{ name: "name", placeholder: "name — Clan name to search" }],
     responseType: "json" as const,
   },
+  {
+    title: "Join Clan",
+    description: "Join a clan using access/JWT token and clan ID",
+    baseUrl: "https://wotaxxdev-api.vercel.app/join",
+    params: [
+      { name: "token", placeholder: "token — Access Token or JWT" },
+      { name: "clanid", placeholder: "clanid — Target Clan ID" },
+    ],
+    responseType: "json" as const,
+  },
 ];
 
 function useContentProtection() {
   const [toastVisible, setToastVisible] = useState(false);
-
   const trigger = useCallback(() => setToastVisible(true), []);
 
   useEffect(() => {
     const onContextMenu = (e: MouseEvent) => { e.preventDefault(); trigger(); };
     const onKeyDown = (e: KeyboardEvent) => {
       if (e.key === "F12") { e.preventDefault(); trigger(); return; }
-      if (e.ctrlKey && e.shiftKey && (e.key === "I" || e.key === "i")) { e.preventDefault(); trigger(); return; }
-      if (e.ctrlKey && (e.key === "U" || e.key === "u")) { e.preventDefault(); trigger(); return; }
-      if (e.ctrlKey && e.shiftKey && (e.key === "J" || e.key === "j")) { e.preventDefault(); trigger(); return; }
-      if (e.ctrlKey && e.shiftKey && (e.key === "C" || e.key === "c")) { e.preventDefault(); trigger(); return; }
+      if (e.ctrlKey && e.shiftKey && ["I","i","J","j","C","c"].includes(e.key)) { e.preventDefault(); trigger(); return; }
+      if (e.ctrlKey && ["U","u"].includes(e.key)) { e.preventDefault(); trigger(); return; }
     };
-
     document.addEventListener("contextmenu", onContextMenu);
     document.addEventListener("keydown", onKeyDown);
     return () => {
@@ -165,8 +171,6 @@ function useContentProtection() {
 }
 
 function Playground() {
-  const [activeCard, setActiveCard] = useState<string | null>(null);
-
   return (
     <div className="min-h-screen relative playground-enter">
       <ParticleBackground />
@@ -183,8 +187,6 @@ function Playground() {
                 urlTemplate={(ep as any).urlTemplate}
                 params={ep.params}
                 responseType={ep.responseType}
-                isActive={activeCard === ep.title}
-                onActivate={() => setActiveCard((prev) => prev === ep.title ? null : ep.title)}
               />
             ))}
           </div>
